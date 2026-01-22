@@ -16,37 +16,68 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-4">
             <Link to="/login">
-              <Button variant="ghost">Sign In</Button>
+              <Button className="cursor-pointer" variant="ghost">
+                Sign In
+              </Button>
             </Link>
             <Link to="/login?mode=signup">
-              <Button>Get Started</Button>
+              <Button className="cursor-pointer">Get Started</Button>
             </Link>
           </div>
         </nav>
       </header>
 
       {/* Hero Content */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-slate-900 dark:text-white mb-6">
-          Collaborate in Real-Time
-          <br />
-          <span className="text-primary">Manage Projects Better</span>
-        </h1>
-        <p className="text-xl text-slate-600 dark:text-slate-300 mb-8 max-w-2xl mx-auto">
-          A modern project management tool with real-time collaboration, drag & drop kanban boards,
-          and role-based access control.
-        </p>
-        <div className="flex items-center justify-center gap-4">
-          <Link to="/login?mode=signup">
-            <Button size="lg" className="text-lg">
-              Start Free Trial <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
-          <Link to="/login">
-            <Button size="lg" variant="outline" className="text-lg">
-              Sign In
-            </Button>
-          </Link>
+      <section className="px-4 pt-16 pb-24 md:pt-24 md:pb-32">
+        <div className="max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 dark:bg-primary/20 rounded-full mb-6">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            <span className="text-sm font-medium text-primary">
+              Now with real-time collaboration
+            </span>
+          </div>
+
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
+            Project management
+            <br />
+            that actually <span className="text-primary">works</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl leading-relaxed">
+            Stop juggling spreadsheets and endless email threads. TaskFlow brings your team together
+            with intuitive kanban boards, real-time updates, and powerful collaboration tools.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-12">
+            <Link to="/login?mode=signup">
+              <Button size="lg" className="text-base px-8 h-12 w-full sm:w-auto cursor-pointer">
+                Get started free
+              </Button>
+            </Link>
+            <Link to="/login">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-base px-8 h-12 w-full sm:w-auto cursor-pointer">
+                Sign in
+              </Button>
+            </Link>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-6 text-sm text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-primary" />
+              <span>Free 14-day trial</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-primary" />
+              <span>No credit card required</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-primary" />
+              <span>Cancel anytime</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -89,29 +120,29 @@ export function LandingPage() {
       </section>
 
       {/* Features List */}
-      <section className="container mx-auto px-4 py-20 bg-slate-50 dark:bg-gray-900/50 rounded-lg">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
-            Everything You Need
-          </h2>
-          <div className="space-y-4">
-            {[
-              'Drag & Drop Kanban Board',
-              'Real-time Collaboration',
-              'Role-based Access Control (Admin, Editor, Viewer)',
-              'Task Assignment & Tracking',
-              'Project Management',
-              'Team Member Management',
-              'Online Presence Indicators',
-              'Dark Mode Support',
-              'Mobile Responsive'
-            ].map((feature, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary shrink-0" />
-                <span className="text-slate-700 dark:text-slate-300">{feature}</span>
-              </div>
-            ))}
-          </div>
+      <section className="container mx-auto px-4 py-20">
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-900 dark:text-white mb-16">
+          Everything You Need
+        </h2>
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            'Drag & Drop Kanban Board',
+            'Real-time Collaboration',
+            'Role-based Access Control',
+            'Task Assignment & Tracking',
+            'Project Management',
+            'Team Member Management',
+            'Online Presence Indicators',
+            'Dark Mode Support',
+            'Mobile Responsive'
+          ].map((feature, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-3 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-slate-200 dark:border-gray-700">
+              <CheckCircle className="w-5 h-5 text-primary shrink-0" />
+              <span className="text-slate-700 dark:text-slate-300 font-medium">{feature}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -124,7 +155,7 @@ export function LandingPage() {
           Join thousands of teams already using TaskFlow
         </p>
         <Link to="/login?mode=signup">
-          <Button size="lg" className="text-lg">
+          <Button size="lg" className="text-sm cursor-pointer">
             Create Free Account <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </Link>
