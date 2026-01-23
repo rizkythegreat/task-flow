@@ -5,7 +5,7 @@ import { TaskDetail } from '@/features/tasks';
 import { UserPresence } from '@/features/presence';
 import { MembersModal } from '@/features/members';
 import { Button } from '@/shared/components/ui/button';
-import { useTasks } from '@/features/tasks';
+import { useTasks } from '@/features/tasks/';
 import { useProject } from '../hooks/use-projects';
 import { usePermissions, useProjectRole } from '@/shared/hooks/use-permissions';
 import type { TaskWithAssignee } from '@/shared/types';
