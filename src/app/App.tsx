@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/app/providers/ThemeProviders';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { Toaster } from 'sonner';
 import { LandingPage } from '@/pages/LandingPage';
+import { LoginPage } from '@/pages/LoginPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +25,7 @@ export function App() {
             <TooltipProvider>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<LoginPage />} />
               </Routes>
               <Toaster position="bottom-right" />
             </TooltipProvider>
