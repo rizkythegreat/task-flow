@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { KanbanBoard } from '@/features/kanban';
-import { UserPresence } from '@/features/presence';
+import { UserPresence } from '@/features/presence/';
 import { MembersModal } from '@/features/members/';
 import { Button } from '@/shared/components/ui/button';
 import { TaskDetail, TaskModal, useTasks } from '@/features/tasks/';
