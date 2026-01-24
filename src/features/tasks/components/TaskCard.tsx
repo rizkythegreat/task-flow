@@ -52,7 +52,7 @@ export function TaskCard({ task, onClick, disabled }: TaskCardProps) {
           isDragging && 'cursor-grabbing shadow-2xl scale-105 opacity-50 rotate-2',
           disabled && 'opacity-95'
         )}>
-        <CardHeader className="p-3 pb-2">
+        <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <div className="space-y-1.5">
               <CardTitle className="text-sm font-medium line-clamp-2">{task.title}</CardTitle>

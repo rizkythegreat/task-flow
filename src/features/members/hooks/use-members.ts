@@ -91,7 +91,6 @@ export function useUpdateMemberRole() {
   return useMutation({
     mutationFn: async ({
       memberId,
-      projectId,
       role
     }: {
       memberId: string;
@@ -119,7 +118,7 @@ export function useRemoveMember() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ memberId, projectId }: { memberId: string; projectId: string }) => {
+    mutationFn: async ({ memberId }: { memberId: string; projectId: string }) => {
       const { error } = await supabase.from('project_members').delete().eq('id', memberId);
 
       if (error) throw error;

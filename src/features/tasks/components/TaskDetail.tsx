@@ -93,19 +93,24 @@ export function TaskDetail({ open, onOpenChange, task, projectId }: TaskDetailPr
               {(permissions.canEdit || permissions.canDelete) && (
                 <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 mr-8">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0 mr-8 cursor-pointer">
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     {permissions.canEdit && (
-                      <DropdownMenuItem onClick={handleEdit}>
+                      <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Task
                       </DropdownMenuItem>
                     )}
                     {permissions.canDelete && (
-                      <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                      <DropdownMenuItem
+                        onClick={handleDelete}
+                        className="text-destructive cursor-pointer">
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete Task
                       </DropdownMenuItem>

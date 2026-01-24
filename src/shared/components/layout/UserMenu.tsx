@@ -42,7 +42,7 @@ export function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full cursor-pointer">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user?.user_metadata?.avatar_url} alt={userName} />
             <AvatarFallback className="bg-primary text-primary-foreground">
@@ -68,14 +68,17 @@ export function UserMenu() {
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuCheckboxItem checked={theme === 'dark'} onCheckedChange={toggleTheme}>
+        <DropdownMenuCheckboxItem
+          className="cursor-pointer"
+          checked={theme === 'dark'}
+          onCheckedChange={toggleTheme}>
           {theme === 'dark' ? <Moon className="mr-2 h-4 w-4" /> : <Sun className="mr-2 h-4 w-4" />}
           <span>Dark Mode</span>
         </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}
-          className="text-destructive focus:text-destructive">
+          className="text-destructive cursor-pointer focus:text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sign Out</span>
         </DropdownMenuItem>
