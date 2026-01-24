@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { KanbanBoard } from '@/features/kanban';
-import { TaskModal } from '@/features/tasks';
-import { TaskDetail } from '@/features/tasks';
 import { UserPresence } from '@/features/presence';
-import { MembersModal } from '@/features/members';
+import { MembersModal } from '@/features/members/';
 import { Button } from '@/shared/components/ui/button';
-import { useTasks } from '@/features/tasks/';
-import { useProject } from '../hooks/use-projects';
-import { usePermissions, useProjectRole } from '@/shared/hooks/use-permissions';
+import { TaskDetail, TaskModal, useTasks } from '@/features/tasks/';
+import { useProject } from '../hooks/use-project';
+import { usePermissions, useProjectRole } from '@/shared/hooks/use-permission';
 import type { TaskWithAssignee } from '@/shared/types';
 import { Plus, Users, Loader2 } from 'lucide-react';
 
