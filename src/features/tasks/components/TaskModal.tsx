@@ -158,7 +158,7 @@ export function TaskModal({
           <DialogTitle>{isEditing ? 'Edit Task' : 'Create New Task'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 touch-pan-y">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 touch-pan-y no-scrollbar max-h-[50vh]">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
@@ -273,21 +273,7 @@ export function TaskModal({
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            {isEditing && canDelete && (
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isLoading}
-                className="mr-auto">
-                {deleteTask.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Trash2 className="w-4 h-4" />
-                )}
-              </Button>
-            )}
+          <DialogFooter className="gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>

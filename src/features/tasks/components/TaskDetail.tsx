@@ -86,7 +86,7 @@ export function TaskDetail({ open, onOpenChange, task, projectId }: TaskDetailPr
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-150 max-h-[85vh] overflow-y-auto bg-card dark:bg-card rounded-lg">
           <DialogHeader>
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 no-scrollbar max-h-[50vh] overflow-y-auto">
               <DialogTitle className="text-xl font-semibold leading-tight pr-8">
                 {task?.title}
               </DialogTitle>

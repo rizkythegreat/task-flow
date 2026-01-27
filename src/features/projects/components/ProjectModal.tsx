@@ -75,7 +75,7 @@ export function ProjectModal({ open, onOpenChange, project }: ProjectModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-125 max-w-100 bg-card dark:bg-card rounded-lg">
+      <DialogContent className="sm:max-w-125 bg-card dark:bg-card rounded-lg">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Project' : 'Create New Project'}</DialogTitle>
         </DialogHeader>
