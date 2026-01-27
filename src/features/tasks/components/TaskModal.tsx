@@ -23,7 +23,7 @@ import { useCreateTask, useUpdateTask, useDeleteTask } from '../hooks/use-tasks'
 import { useProject } from '@/features/projects';
 import { usePermissions } from '@/shared/hooks/use-permission';
 import { toast } from 'sonner';
-import { Loader2, Trash2, X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { Badge } from '@/shared/components/ui/badge';
 
 interface TaskModalProps {
@@ -57,7 +57,6 @@ export function TaskModal({
 
   const isEditing = !!task;
   const canEdit = permissions.canEdit;
-  const canDelete = permissions.canDelete;
 
   useEffect(() => {
     if (task) {
@@ -131,21 +130,6 @@ export function TaskModal({
     } catch (error) {
       console.error('Error saving task:', error);
       toast.error(isEditing ? 'Failed to update task' : 'Failed to create task');
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!task || !canDelete) return;
-
-    if (!confirm('Are you sure you want to delete this task?')) return;
-
-    try {
-      await deleteTask.mutateAsync({ id: task.id, projectId });
-      toast.success('Task deleted successfully');
-      onOpenChange(false);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      toast.error('Failed to delete task');
     }
   };
 
