@@ -1,13 +1,34 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
-import { ArrowRight, CheckCircle, Users, Zap, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle, Users, Zap, Shield, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/app/providers/ThemeProviders';
+import { cn } from '@/shared/lib/utils';
+import { useEffect, useState } from 'react';
 
 export function LandingPage() {
+  const { theme, toggleTheme } = useTheme();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Hero Section */}
-      <header className="container mx-auto px-4 py-6">
-        <nav className="flex items-center justify-between">
+      <header
+        className={cn(
+          'sticky top-0 z-40 px-4 py-6',
+          isScrolled && 'bg-background/80 backdrop:blur-sm'
+        )}>
+        <nav className="flex items-center justify-between container mx-auto">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">T</span>
@@ -15,6 +36,9 @@ export function LandingPage() {
             <span className="font-bold text-xl dark:text-white">TaskFlow</span>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} className="w-9 h-9">
+              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
             <Link to="/login">
               <Button className="cursor-pointer" variant="ghost">
                 Sign In
