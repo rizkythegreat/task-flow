@@ -71,7 +71,7 @@ export function useInviteMember() {
           project_id: projectId,
           user_id: profiles.id,
           role
-        } as any)
+        })
         .select()
         .single();
 
@@ -99,7 +99,7 @@ export function useUpdateMemberRole() {
     }) => {
       const { data, error } = await supabase
         .from('project_members')
-        .update({ role } as never)
+        .update({ role })
         .eq('id', memberId)
         .select()
         .single();

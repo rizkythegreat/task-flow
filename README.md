@@ -292,6 +292,13 @@ npm run dev
 npm run build
 ```
 
+### Run Tests
+
+```bash
+npm run test       # watch mode
+npm run test:run   # single run
+```
+
 ### Lint Code
 
 ```bash

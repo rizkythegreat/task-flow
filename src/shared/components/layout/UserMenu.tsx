@@ -1,5 +1,5 @@
-import { useAuth } from '@/app/providers/AuthProviders';
-import { useTheme } from '@/app/providers/ThemeProviders';
+import { useAuth } from '@/app/providers/use-auth';
+import { useTheme } from '@/app/providers/use-theme';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
 import {
@@ -22,8 +22,8 @@ export function UserMenu() {
     try {
       await signOut();
       toast.success('Signed out successfully');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to sign out');
     }
   };
 

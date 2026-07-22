@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import type { TaskWithAssignee, TaskStatus } from '@/shared/types';
-import { useAuth } from '@/app/providers/AuthProviders';
+import type { TaskWithAssignee, TaskStatus, Updates } from '@/shared/types';
+import { useAuth } from '@/app/providers/use-auth';
 
 export function useTasks(projectId: string | undefined) {
   const queryClient = useQueryClient();
@@ -80,7 +80,7 @@ export function useCreateTask() {
           ...task,
           created_by: user.id,
           tags: task.tags || []
-        } as any)
+        })
         .select()
         .single();
 
@@ -117,7 +117,7 @@ export function useUpdateTask() {
       order?: number;
       tags?: string[];
     }) => {
-      const updateData: any = {};
+      const updateData: Updates<'tasks'> = {};
 
       if (title !== undefined) updateData.title = title;
       if (description !== undefined) updateData.description = description;

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import type { Project, ProjectWithMembers } from '@/shared/types';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 
 export function useProjects() {
   const { user } = useAuth();
@@ -103,9 +103,9 @@ export function useProject(projectId: string | undefined) {
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'projects', filter: `id=eq.${projectId}` },
         (payload) => {
-          queryClient.setQueryData(['project', projectId], (oldData: any) => {
+          queryClient.setQueryData<ProjectWithMembers>(['project', projectId], (oldData) => {
             if (!oldData) return oldData;
-            return { ...oldData, ...payload.new };
+            return { ...oldData, ...(payload.new as Project) };
           });
         }
       )
@@ -145,7 +145,7 @@ export function useCreateProject() {
           name: project.name,
           description: project.description,
           owner_id: user.id
-        } as any)
+        })
         .select()
         .single();
 

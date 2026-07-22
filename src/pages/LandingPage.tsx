@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/shared/components/ui/button';
 import { ArrowRight, CheckCircle, Users, Zap, Shield, Moon, Sun } from 'lucide-react';
-import { useTheme } from '@/app/providers/ThemeProviders';
+import { useTheme } from '@/app/providers/use-theme';
 import { cn } from '@/shared/lib/utils';
 import { useEffect, useState } from 'react';
 

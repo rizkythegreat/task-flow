@@ -13,11 +13,16 @@ npm run dev       # Vite dev server at http://localhost:5173
 npm run build     # tsc -b && vite build — this is also the type check (no separate typecheck script)
 npm run lint      # eslint .
 npm run preview   # preview production build
+npm run test      # Vitest in watch mode
+npm run test:run  # Vitest single run (CI mode)
+npx vitest run src/shared/hooks/__tests__/use-permission.test.tsx   # run a single test file
 ```
 
 Both `package-lock.json` and `bun.lock` exist; `bun` commands work equally.
 
-There is no test framework configured — no test files, no test script.
+**Testing**: Vitest + React Testing Library (jsdom, globals enabled, setup in `src/test/setup.ts`, config in the `test` block of `vite.config.ts`). Tests are colocated in `__tests__/` folders next to the code. Patterns: mock `@/shared/lib/supabase` and `@/app/providers/AuthProviders` with `vi.mock`, wrap hooks in a fresh `QueryClientProvider` (retry disabled), wrap dnd-kit components in `DndContext`/`SortableContext`.
+
+Note: `npm run lint` currently reports pre-existing errors in older files (`no-explicit-any`, `react-refresh/only-export-components`) — not a regression signal by itself.
 
 **Environment**: `.env` with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` is required; `src/shared/lib/supabase.ts` throws at startup if missing. Copy from `.env.example`.
 

@@ -14,7 +14,6 @@ import { useCreateProject, useUpdateProject } from '@/features/projects/hooks/us
 import type { Project } from '@/shared/types';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
 
 interface ProjectModalProps {
   open: boolean;
@@ -31,15 +30,14 @@ export function ProjectModal({ open, onOpenChange, project }: ProjectModalProps)
 
   const isEditing = !!project;
 
-  useEffect(() => {
-    if (project) {
-      setName(project.name);
-      setDescription(project.description || '');
-    } else {
-      setName('');
-      setDescription('');
-    }
-  }, [project]);
+  // Sinkronkan form saat project berubah — pola "adjust state during render"
+  // (https://react.dev/learn/you-might-not-need-an-effect), bukan useEffect
+  const [prevProject, setPrevProject] = useState<Project | null | undefined>(undefined);
+  if (project !== prevProject) {
+    setPrevProject(project);
+    setName(project?.name ?? '');
+    setDescription(project?.description ?? '');
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,8 +1,8 @@
 import { Button } from '@/shared/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/shared/components/ui/tooltip';
-import { useAuth } from '@/app/providers/AuthProviders';
-import { useTheme } from '@/app/providers/ThemeProviders';
+import { useAuth } from '@/app/providers/use-auth';
+import { useTheme } from '@/app/providers/use-theme';
 import { LogOut, ArrowLeft, Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 

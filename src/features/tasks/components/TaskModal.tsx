@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -58,7 +58,13 @@ export function TaskModal({
   const isEditing = !!task;
   const canEdit = permissions.canEdit;
 
-  useEffect(() => {
+  // Sinkronkan form saat task/defaultStatus berubah — pola "adjust state during
+  // render" (https://react.dev/learn/you-might-not-need-an-effect), bukan useEffect
+  const [prevTask, setPrevTask] = useState<TaskWithAssignee | null | undefined>(undefined);
+  const [prevDefaultStatus, setPrevDefaultStatus] = useState<TaskStatus | undefined>(undefined);
+  if (task !== prevTask || defaultStatus !== prevDefaultStatus) {
+    setPrevTask(task);
+    setPrevDefaultStatus(defaultStatus);
     if (task) {
       setTitle(task.title);
       setDescription(task.description || '');
@@ -74,7 +80,7 @@ export function TaskModal({
       setAssignedTo('');
       setTags([]);
     }
-  }, [task, defaultStatus]);
+  }
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -247,7 +253,7 @@ export function TaskModal({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Unassigned">Unassigned</SelectItem>
-                  {project?.members?.map((member: any) => (
+                  {project?.members?.map((member) => (
                     <SelectItem key={member.profile.id} value={member.profile.id}>
                       {member.profile.full_name} ({member.role})
                     </SelectItem>

@@ -24,7 +24,7 @@ import {
   useUpdateMemberRole,
   useRemoveMember
 } from '@/features/members';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 import { useIsAdmin } from '@/shared/hooks/use-permission';
 import type { UserRole } from '@/shared/types';
 import { USER_ROLES } from '@/shared/types';
@@ -89,9 +89,9 @@ export function MembersModal({ open, onOpenChange, projectId }: MembersModalProp
       setEmail('');
       setSelectedRole('viewer');
       setShowInviteForm(false);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error inviting member:', error);
-      toast.error(error.message || 'Failed to invite member');
+      toast.error(error instanceof Error ? error.message : 'Failed to invite member');
     }
   };
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthForm } from '@/features/auth';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 import { Loader2 } from 'lucide-react';
 
 export function LoginPage() {

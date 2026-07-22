@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ProjectList } from '@/features/projects';
 import { ProjectBoard } from '@/features/projects/';
 import { UserMenu } from '@/shared/components/layout';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 import { Button } from '@/shared/components/ui/button';
 import { Loader2, ArrowLeft } from 'lucide-react';
 

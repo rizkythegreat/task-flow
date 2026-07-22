@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 import type { UserRole, Permissions } from '@/shared/types';
 
 export function useProjectRole(projectId: string | undefined) {
@@ -29,11 +29,44 @@ export function useProjectRole(projectId: string | undefined) {
   });
 }
 
-export function usePermissions(projectId: string | undefined): Permissions {
-  const { data: role } = useProjectRole(projectId);
+// Pure mapping role -> permissions, di-export agar bisa di-unit-test langsung
+export function getPermissions(role: UserRole | null): Permissions {
+  if (!role) {
+    return {
+      canView: false,
+      canEdit: false,
+      canDelete: false,
+      canManageMembers: false,
+      canAssignTasks: false
+    };
+  }
 
-  const getPermissions = (role: UserRole | null): Permissions => {
-    if (!role) {
+  switch (role) {
+    case 'admin':
+      return {
+        canView: true,
+        canEdit: true,
+        canDelete: true,
+        canManageMembers: true,
+        canAssignTasks: true
+      };
+    case 'editor':
+      return {
+        canView: true,
+        canEdit: true,
+        canDelete: false,
+        canManageMembers: false,
+        canAssignTasks: true
+      };
+    case 'viewer':
+      return {
+        canView: true,
+        canEdit: false,
+        canDelete: false,
+        canManageMembers: false,
+        canAssignTasks: false
+      };
+    default:
       return {
         canView: false,
         canEdit: false,
@@ -41,44 +74,11 @@ export function usePermissions(projectId: string | undefined): Permissions {
         canManageMembers: false,
         canAssignTasks: false
       };
-    }
+  }
+}
 
-    switch (role) {
-      case 'admin':
-        return {
-          canView: true,
-          canEdit: true,
-          canDelete: true,
-          canManageMembers: true,
-          canAssignTasks: true
-        };
-      case 'editor':
-        return {
-          canView: true,
-          canEdit: true,
-          canDelete: false,
-          canManageMembers: false,
-          canAssignTasks: true
-        };
-      case 'viewer':
-        return {
-          canView: true,
-          canEdit: false,
-          canDelete: false,
-          canManageMembers: false,
-          canAssignTasks: false
-        };
-      default:
-        return {
-          canView: false,
-          canEdit: false,
-          canDelete: false,
-          canManageMembers: false,
-          canAssignTasks: false
-        };
-    }
-  };
-
+export function usePermissions(projectId: string | undefined): Permissions {
+  const { data: role } = useProjectRole(projectId);
   return getPermissions(role ?? null);
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/shared/lib/supabase';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 
 interface PresenceState {
   user_id: string;
@@ -23,10 +23,9 @@ export function useUserPresence(projectId: string | undefined) {
 
     channel
       .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
+        const state = channel.presenceState<PresenceState>();
         const transformed: PresenceState[] = Object.values(state)
           .flat()
-          .map((presence: any) => presence)
           .filter((v, i, a) => a.findIndex((t) => t.user_id === v.user_id) === i);
 
         setOnlineUsers(transformed);

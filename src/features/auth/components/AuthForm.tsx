@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useAuth } from '@/app/providers/AuthProviders';
+import { useAuth } from '@/app/providers/use-auth';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
@@ -41,8 +41,8 @@ export function AuthForm({ initialMode = 'signin' }: AuthFormProps) {
         await signUp(email, password, fullName);
         toast.success('Account created! Please check your email to verify.');
       }
-    } catch (error: any) {
-      toast.error(error.message || 'An error occurred');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
