@@ -1,0 +1,10 @@
+{
+  "name": "taskflow-supabase-keepalive",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-01",
+  "triggers": {
+    // Senin & Kamis 00:00 UTC — 2x seminggu supaya ada margin:
+    // kalau strict 7 hari sekali dan satu run gagal, project keburu di-pause Supabase.
+    "crons": ["0 0 * * 1,4"]
+  }
+}
