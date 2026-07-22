@@ -4,9 +4,12 @@ import { AuthProvider } from '@/app/providers/AuthProviders';
 import { ThemeProvider } from '@/app/providers/ThemeProviders';
 import { TooltipProvider } from '@/shared/components/ui/tooltip';
 import { Toaster } from 'sonner';
+import { ProtectedRoute } from '@/features/auth';
+import { AppLayout } from '@/shared/components/layout';
 import { LandingPage } from '@/pages/LandingPage';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { ProjectPage } from '@/pages/ProjectPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -28,7 +31,13 @@ export function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route element={<AppLayout />}>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/projects/:projectId" element={<ProjectPage />} />
+                    <Route path="/projects/:projectId/tasks/:taskId" element={<ProjectPage />} />
+                  </Route>
+                </Route>
                 <Route path="/app" element={<Navigate to="/dashboard" replace />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

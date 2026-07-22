@@ -32,8 +32,8 @@ Note: `npm run lint` currently reports pre-existing errors in older files (`no-e
 
 ### Structure
 
-- `src/app/` — `App.tsx` (router + provider tree) and providers (`AuthProviders.tsx`, `ThemeProviders.tsx`)
-- `src/pages/` — route components: `LandingPage`, `LoginPage`, `DashboardPage`, `NotFoundPage`
+- `src/app/` — `App.tsx` (router + provider tree) and providers (`AuthProviders.tsx`, `ThemeProviders.tsx`; hooks live separately in `use-auth.ts` / `use-theme.ts`)
+- `src/pages/` — route components: `LandingPage`, `LoginPage`, `DashboardPage`, `ProjectPage`, `NotFoundPage`
 - `src/features/{auth,projects,tasks,kanban,members,presence}/` — feature modules, each with `components/`, optional `hooks/`, and an `index.ts` barrel export
 - `src/shared/` — `components/ui/` (shadcn/ui), `components/layout/`, `hooks/`, `lib/`, `types/`
 
@@ -43,7 +43,15 @@ Note: the README's "Project Structure" section is partly outdated (e.g. `stores/
 
 ### Routing & navigation
 
-Only 4 routes exist. The whole app lives in `/dashboard`: selecting a project is local `useState` in `DashboardPage` (ProjectList ↔ ProjectBoard toggle), **not** a route param. There is no URL per project/task.
+URL is the source of truth for navigation:
+
+```
+/dashboard                          → project list
+/projects/:projectId                → kanban board (ProjectPage → ProjectBoard)
+/projects/:projectId/tasks/:taskId  → same board with TaskDetail modal open (modal route)
+```
+
+Authenticated routes are nested under `<ProtectedRoute>` (redirects to `/login`, preserving origin in `location.state.from` — LoginPage navigates back after sign-in) and `<AppLayout>` (shared header + `<Outlet />`). The TaskDetail modal is URL-driven: `ProjectBoard` derives `detailTask` from the `taskId` param by looking it up in the `useTasks` cache (so realtime updates refresh an open detail), and an unknown `taskId` redirects back to the board. The TaskModal (create/edit form) intentionally stays local state — only *viewing* a task has a URL.
 
 ### Data layer pattern
 
@@ -58,7 +66,7 @@ Presence (`features/presence/hooks/use-presence.ts`) is different: it uses Supab
 
 ### Auth & permissions (two layers)
 
-- **Client**: `AuthProvider` (`src/app/providers/AuthProviders.tsx`) exposes `useAuth()` with `user`, `profile` (from the `profiles` table), and sign-in/up/out. Route protection is imperative — `DashboardPage` redirects to `/login` in a `useEffect`; there is no `ProtectedRoute` wrapper.
+- **Client**: `AuthProvider` (`src/app/providers/AuthProviders.tsx`) provides the context; `useAuth()` lives in `src/app/providers/use-auth.ts`. Route protection is declarative via the `ProtectedRoute` layout route (`src/features/auth/components/ProtectedRoute.tsx`).
 - **UI gating**: `usePermissions(projectId)` in `src/shared/hooks/use-permission.tsx` maps the user's `project_members.role` (admin/editor/viewer) to a `Permissions` object used to show/hide controls.
 - **Enforcement**: real security is the RLS policies in `supabase-schema.sql` (e.g. only editors/admins can insert tasks, only admins delete). Client permission checks are cosmetic; if adding a capability, the RLS policy must allow it too.
 

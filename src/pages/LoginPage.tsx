@@ -1,21 +1,26 @@
 import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthForm } from '@/features/auth';
 import { useAuth } from '@/app/providers/use-auth';
 import { Loader2 } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user, loading } = useAuth();
 
   const currentMode = searchParams.get('mode') === 'signup' ? 'signup' : 'signin';
 
+  // Kembali ke halaman asal (di-set oleh ProtectedRoute), default ke dashboard
+  const from =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/dashboard';
+
   useEffect(() => {
     if (user && !loading) {
-      navigate('/dashboard');
+      navigate(from, { replace: true });
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, from]);
 
   if (loading) {
     return (

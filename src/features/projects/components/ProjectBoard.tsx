@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { KanbanBoard } from '@/features/kanban';
 import { UserPresence } from '@/features/presence/';
 import { MembersModal } from '@/features/members/';
@@ -11,13 +12,16 @@ import { Plus, Users, Loader2 } from 'lucide-react';
 
 interface ProjectBoardProps {
   projectId: string;
-  onBack?: () => void;
 }
 
 export function ProjectBoard({ projectId }: ProjectBoardProps) {
+  // Task detail dikendalikan URL (/projects/:projectId/tasks/:taskId) agar bisa
+  // di-share, di-bookmark, dan tahan refresh. selectedTask hanya untuk form modal.
+  const { taskId } = useParams<{ taskId?: string }>();
+  const navigate = useNavigate();
+
   const [selectedTask, setSelectedTask] = useState<TaskWithAssignee | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [isTaskDetailOpen, setIsTaskDetailOpen] = useState(false);
   const [isMembersModalOpen, setIsMembersModalOpen] = useState(false);
 
   const { data: tasks, isLoading: tasksLoading } = useTasks(projectId);
@@ -25,9 +29,11 @@ export function ProjectBoard({ projectId }: ProjectBoardProps) {
   const { isLoading: roleLoading } = useProjectRole(projectId);
   const permissions = usePermissions(projectId);
 
+  // Diturunkan dari cache query — ikut ter-update saat ada perubahan realtime
+  const detailTask = taskId ? (tasks?.find((t) => t.id === taskId) ?? null) : null;
+
   const handleTaskClick = (task: TaskWithAssignee) => {
-    setSelectedTask(task);
-    setIsTaskDetailOpen(true);
+    navigate(`/projects/${projectId}/tasks/${task.id}`);
   };
 
   const handleCreateTask = () => {
@@ -37,8 +43,8 @@ export function ProjectBoard({ projectId }: ProjectBoardProps) {
 
   const handleEditTask = (task: TaskWithAssignee) => {
     setSelectedTask(task);
-    setIsTaskDetailOpen(false);
     setIsTaskModalOpen(true);
+    navigate(`/projects/${projectId}`);
   };
 
   const handleCloseTaskModal = () => {
@@ -47,8 +53,7 @@ export function ProjectBoard({ projectId }: ProjectBoardProps) {
   };
 
   const handleCloseTaskDetail = () => {
-    setIsTaskDetailOpen(false);
-    setSelectedTask(null);
+    navigate(`/projects/${projectId}`);
   };
 
   if (tasksLoading || projectLoading || roleLoading) {
@@ -65,6 +70,11 @@ export function ProjectBoard({ projectId }: ProjectBoardProps) {
         <p className="text-slate-500">Project not found</p>
       </div>
     );
+  }
+
+  // taskId di URL tidak ada di project ini (link salah / task sudah dihapus)
+  if (taskId && tasks && !detailTask) {
+    return <Navigate to={`/projects/${projectId}`} replace />;
   }
 
   return (
@@ -122,12 +132,12 @@ export function ProjectBoard({ projectId }: ProjectBoardProps) {
         projectId={projectId}
       />
 
-      {/* Task Detail Modal */}
-      {selectedTask && (
+      {/* Task Detail Modal — dikendalikan URL */}
+      {detailTask && (
         <TaskDetail
-          open={isTaskDetailOpen}
+          open={!!detailTask}
           onOpenChange={handleCloseTaskDetail}
-          task={selectedTask}
+          task={detailTask}
           projectId={projectId}
           onEdit={handleEditTask}
         />
