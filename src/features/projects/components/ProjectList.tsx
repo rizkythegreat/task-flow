@@ -18,7 +18,9 @@ interface ProjectListProps {
 
 export function ProjectList({ onSelectProject }: ProjectListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: projects, isLoading } = useProjects();
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useProjects();
+
+  const projects = data?.pages.flat();
 
   if (isLoading) {
     return (
@@ -65,35 +67,52 @@ export function ProjectList({ onSelectProject }: ProjectListProps) {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {projects.map((project) => (
-              <Card
-                key={project.id}
-                className="cursor-pointer hover:shadow-lg transition-shadow border-border bg-card dark:bg-card dark:hover:border-primary/50"
-                onClick={() => onSelectProject(project.id)}>
-                <CardHeader>
-                  <CardTitle className="text-lg line-clamp-1 flex items-center gap-2">
-                    <Folder className="w-5 h-5 text-primary shrink-0" />
-                    {project.name}
-                  </CardTitle>
-                  {project.description && (
-                    <CardDescription className="line-clamp-2 dark:text-slate-400">
-                      {project.description}
-                    </CardDescription>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                    <Calendar className="w-4 h-4" />
-                    {project.created_at &&
-                      formatDistanceToNow(new Date(project.created_at), {
-                        addSuffix: true
-                      })}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {projects.map((project) => (
+                <Card
+                  key={project.id}
+                  className="cursor-pointer hover:shadow-lg transition-shadow border-border bg-card dark:bg-card dark:hover:border-primary/50"
+                  onClick={() => onSelectProject(project.id)}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-lg line-clamp-1 flex items-center gap-2">
+                      <Folder className="w-5 h-5 text-primary shrink-0" />
+                      {project.name}
+                    </CardTitle>
+                    {project.description && (
+                      <CardDescription className="line-clamp-2 dark:text-slate-400">
+                        {project.description}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                      <Calendar className="w-4 h-4" />
+                      {project.created_at &&
+                        formatDistanceToNow(new Date(project.created_at), {
+                          addSuffix: true
+                        })}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination: muat halaman berikutnya secara bertahap */}
+            {hasNextPage && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Load More
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

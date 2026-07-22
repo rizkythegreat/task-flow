@@ -51,16 +51,18 @@ URL is the source of truth for navigation:
 /projects/:projectId/tasks/:taskId  → same board with TaskDetail modal open (modal route)
 ```
 
-Authenticated routes are nested under `<ProtectedRoute>` (redirects to `/login`, preserving origin in `location.state.from` — LoginPage navigates back after sign-in) and `<AppLayout>` (shared header + `<Outlet />`). The TaskDetail modal is URL-driven: `ProjectBoard` derives `detailTask` from the `taskId` param by looking it up in the `useTasks` cache (so realtime updates refresh an open detail), and an unknown `taskId` redirects back to the board. The TaskModal (create/edit form) intentionally stays local state — only *viewing* a task has a URL.
+All pages are lazy-loaded (`React.lazy` + `Suspense` in `App.tsx`) — dnd-kit/kanban only ships on the project route. Authenticated routes are nested under `<ProtectedRoute>` (redirects to `/login`, preserving origin in `location.state.from` — LoginPage navigates back after sign-in) and `<AppLayout>` (shared header + `<Outlet />`). The TaskDetail modal is URL-driven: `ProjectBoard` derives `detailTask` from the `taskId` param by looking it up in the `useTasks` cache (so realtime updates refresh an open detail), and an unknown `taskId` redirects back to the board. The TaskModal (create/edit form) intentionally stays local state — only *viewing* a task has a URL.
 
 ### Data layer pattern
 
 No client state library — server state is entirely TanStack Query, keyed like `['tasks', projectId]`. Each feature exposes hooks in `features/*/hooks/`:
 
-1. A query hook (e.g. `useTasks`) that fetches via Supabase with relation joins (`profiles!tasks_assigned_to_fkey`) **and**, in the same hook, subscribes to a Supabase Realtime `postgres_changes` channel filtered by `project_id`. On any change event it calls `queryClient.invalidateQueries` — that's how real-time sync works; there is no optimistic cache patching.
-2. Mutation hooks (`useCreateTask`, `useUpdateTask`, ...) that invalidate the relevant query key on success. Update mutations take `projectId` solely for invalidation.
+1. A query hook (e.g. `useTasks`) that fetches via Supabase with relation joins (`profiles!tasks_assigned_to_fkey`) **and**, in the same hook, subscribes to a Supabase Realtime `postgres_changes` channel filtered by `project_id`.
+2. Mutation hooks (`useCreateTask`, `useUpdateTask`, ...). Update mutations take `projectId` to locate the cache entry.
 
-Follow this pattern when adding new data access: query + realtime invalidation in one hook, mutations invalidating by key.
+**Tasks use per-event cache patching, not invalidation** (`use-tasks.ts`): realtime UPDATE merges the payload row into the cache via pure helpers (`upsertTask`/`removeTask`/`mergeTaskRow`, unit-tested in `__tests__/task-cache.test.ts`); INSERT and unmergeable UPDATEs (task not in cache, or `assigned_to` changed so the joined assignee is stale) fall back to a **single-row** fetch with relations — never a full-list refetch. The DELETE listener is registered **without** a `project_id` filter on purpose: delete payloads only carry the primary key, so a filter would never match. `useUpdateTask` is optimistic (`onMutate` patch + rollback `onError`) so drag & drop feels instant. Simpler lists (projects, members) still use plain invalidation — acceptable for low-churn data.
+
+**Pagination**: `useProjects` is a `useInfiniteQuery` with `.range()` (page size `PROJECTS_PAGE_SIZE`, "Load More" in ProjectList); consumers flatten `data.pages`. The kanban board deliberately fetches all tasks per project (like Trello) — per-column pagination would break URL-driven task detail and drag ordering.
 
 Presence (`features/presence/hooks/use-presence.ts`) is different: it uses Supabase Presence channels (`channel.track()` with auth metadata, no DB query) — the `user_presence` table in the schema is not what the UI reads.
 

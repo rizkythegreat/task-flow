@@ -80,19 +80,17 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, disabled }: KanbanB
     // Handled by DndContext
   };
 
-  const handleDragEnd = async (event: DragEndEvent) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (!over) {
-      setActiveTask(null);
-      return;
-    }
+    // Lepas overlay secara sinkron — kartu di cache sudah dipindah optimistically,
+    // jadi tidak perlu menunggu round-trip server
+    setActiveTask(null);
+
+    if (!over) return;
 
     const activeTask = tasks.find((t) => t.id === active.id);
-    if (!activeTask) {
-      setActiveTask(null);
-      return;
-    }
+    if (!activeTask) return;
 
     const overId = over.id as string;
     const isOverColumn = TASK_STATUSES.includes(overId as TaskStatus);
@@ -116,24 +114,24 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, disabled }: KanbanB
       }
     }
 
-    // Update task status and order
+    // Update task status and order — fire-and-forget: UI sudah berubah via
+    // optimistic patch; kalau gagal, cache di-rollback otomatis + tampilkan error
     if (newStatus !== activeTask.status || newOrder !== activeTask.order) {
-      try {
-        await updateTask.mutateAsync({
+      updateTask.mutate(
+        {
           id: activeTask.id,
           projectId,
           status: newStatus,
           order: newOrder
-        });
-
-        toast.success('Task updated successfully');
-      } catch (error) {
-        console.error('Error updating task:', error);
-        toast.error('Failed to update task');
-      }
+        },
+        {
+          onError: (error) => {
+            console.error('Error updating task:', error);
+            toast.error('Failed to update task');
+          }
+        }
+      );
     }
-
-    setActiveTask(null);
   };
 
   const handleDragCancel = () => {
@@ -162,7 +160,9 @@ export function KanbanBoard({ tasks, projectId, onTaskClick, disabled }: KanbanB
         </div>
       </div>
 
-      <DragOverlay>
+      {/* dropAnimation={null}: animasi default menganimasikan overlay kembali ke
+          posisi lama sebelum re-render optimistic — terlihat seperti "balik dulu" */}
+      <DragOverlay dropAnimation={null}>
         {activeTask ? <TaskCard task={activeTask} disabled={disabled} /> : null}
       </DragOverlay>
     </DndContext>

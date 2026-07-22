@@ -1,18 +1,23 @@
 import { useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/shared/lib/supabase';
 import type { Project, ProjectWithMembers } from '@/shared/types';
 import { useAuth } from '@/app/providers/use-auth';
+
+export const PROJECTS_PAGE_SIZE = 12;
 
 export function useProjects() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const query = useQuery({
+  // Infinite query dengan .range() — halaman dimuat bertahap ("Load More"),
+  // bukan seluruh daftar sekaligus
+  const query = useInfiniteQuery({
     queryKey: ['projects', user?.id],
-    queryFn: async () => {
+    queryFn: async ({ pageParam }) => {
       if (!user) return [];
 
+      const from = pageParam * PROJECTS_PAGE_SIZE;
       const { data, error } = await supabase
         .from('project_members')
         .select(
@@ -29,11 +34,16 @@ export function useProjects() {
           )
         `
         )
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range(from, from + PROJECTS_PAGE_SIZE - 1);
 
       if (error) throw error;
       return data.map((item) => item.projects).filter(Boolean) as Project[];
     },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length === PROJECTS_PAGE_SIZE ? allPages.length : undefined,
     enabled: !!user
   });
 
