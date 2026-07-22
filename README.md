@@ -1,4 +1,4 @@
-# Real-Time Collaborative Project Management
+# TaskFlow — Real-Time Collaborative Project Management
 
 A modern, real-time collaborative project management application built with React, TypeScript, Supabase, and TanStack Query. Features include drag-and-drop task management, role-based access control, and live collaboration.
 
@@ -42,7 +42,7 @@ A modern, real-time collaborative project management application built with Reac
 
    ```bash
    git clone <repository-url>
-   cd task-management
+   cd taskflow
    ```
 
 2. **Install dependencies**
@@ -66,6 +66,7 @@ A modern, real-time collaborative project management application built with Reac
    ```env
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_PROJECT_ID=your_supabase_project_id   # optional, only used with the Supabase CLI
    ```
 
    d. Run the SQL schema in Supabase SQL Editor:
@@ -73,6 +74,7 @@ A modern, real-time collaborative project management application built with Reac
    - Navigate to SQL Editor
    - Copy and paste the contents of `supabase-schema.sql`
    - Execute the SQL
+   - Then run `fix-rls-policy.sql` (patches the `project_members` insert policy so project owners can add the first member)
 
 4. **Start the development server**
 
@@ -172,160 +174,62 @@ tasks
 ## 📁 Project Structure
 
 ```
-task-management/
-├── public/                          # Static assets
-│   └── vite.svg
+taskflow/
+├── public/                         # Static assets
 │
 ├── src/
 │   ├── app/                        # App-level configuration
-│   │   ├── App.tsx                 # Main App component
-│   │   └── providers/              # App providers
-│   │       ├── AuthProvider.tsx
-│   │       ├── ThemeProvider.tsx
-│   │       └── QueryProvider.tsx
+│   │   ├── App.tsx                 # Router + provider tree
+│   │   └── providers/
+│   │       ├── AuthProviders.tsx   # Auth context (useAuth)
+│   │       └── ThemeProviders.tsx  # Light/dark theme
+│   │
+│   ├── pages/                      # Route components
+│   │   ├── LandingPage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── DashboardPage.tsx       # Main app (project list ↔ board)
+│   │   └── NotFoundPage.tsx
 │   │
 │   ├── features/                   # Feature-based modules
-│   │   ├── auth/                   # Authentication feature
-│   │   │   ├── components/
-│   │   │   │   ├── AuthForm.tsx
-│   │   │   │   └── ProtectedRoute.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── use-auth.ts
-│   │   │   ├── stores/
-│   │   │   │   └── use-auth-store.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── projects/               # Projects feature
-│   │   │   ├── components/
-│   │   │   │   ├── ProjectList.tsx
-│   │   │   │   ├── ProjectBoard.tsx
-│   │   │   │   └── ProjectCard.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── use-projects.ts
-│   │   │   ├── stores/
-│   │   │   │   └── use-project-store.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── tasks/                  # Tasks feature
-│   │   │   ├── components/
-│   │   │   │   ├── TaskCard.tsx
-│   │   │   │   ├── TaskModal.tsx
-│   │   │   │   ├── TaskDetail.tsx
-│   │   │   │   └── TaskFilters.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── use-tasks.ts
-│   │   │   ├── stores/
-│   │   │   │   └── use-task-store.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── kanban/                 # Kanban board feature
-│   │   │   ├── components/
-│   │   │   │   ├── KanbanBoard.tsx
-│   │   │   │   ├── KanbanColumn.tsx
-│   │   │   │   └── DragOverlay.tsx
-│   │   │   └── index.ts
-│   │   │
-│   │   ├── members/                # Members management
-│   │   │   ├── components/
-│   │   │   │   ├── MembersModal.tsx
-│   │   │   │   ├── MemberList.tsx
-│   │   │   │   └── InviteMember.tsx
-│   │   │   ├── hooks/
-│   │   │   │   └── use-members.ts
-│   │   │   └── index.ts
-│   │   │
-│   │   └── presence/               # Real-time presence
-│   │       ├── components/
-│   │       │   └── UserPresence.tsx
-│   │       ├── hooks/
-│   │       │   └── use-presence.ts
-│   │       └── index.ts
+│   │   ├── auth/                   # Authentication (AuthForm)
+│   │   ├── projects/               # ProjectList, ProjectBoard, ProjectModal + use-project.ts
+│   │   ├── tasks/                  # TaskCard, TaskModal, TaskDetail + use-tasks.ts
+│   │   ├── kanban/                 # KanbanBoard, KanbanColumn (drag & drop)
+│   │   ├── members/                # MembersModal + use-members.ts
+│   │   └── presence/               # UserPresence + use-presence.ts
+│   │       # each feature: components/, hooks/, index.ts barrel export
 │   │
 │   ├── shared/                     # Shared resources
-│   │   ├── components/             # Shared components
-│   │   │   ├── ui/                 # UI components (shadcn)
-│   │   │   │   ├── button.tsx
-│   │   │   │   ├── card.tsx
-│   │   │   │   ├── dialog.tsx
-│   │   │   │   ├── input.tsx
-│   │   │   │   ├── select.tsx
-│   │   │   │   ├── badge.tsx
-│   │   │   │   ├── avatar.tsx
-│   │   │   │   ├── label.tsx
-│   │   │   │   ├── textarea.tsx
-│   │   │   │   ├── tooltip.tsx
-│   │   │   │   └── dropdown-menu.tsx
-│   │   │   ├── layout/             # Layout components
-│   │   │   │   ├── Header.tsx
-│   │   │   │   ├── Sidebar.tsx
-│   │   │   │   └── Container.tsx
-│   │   │   └── common/             # Common components
-│   │   │       ├── LoadingSpinner.tsx
-│   │   │       ├── ErrorBoundary.tsx
-│   │   │       └── EmptyState.tsx
-│   │   │
-│   │   ├── hooks/                  # Shared hooks
-│   │   │   ├── use-permissions.ts
-│   │   │   ├── use-toast.ts
-│   │   │   └── use-media-query.ts
-│   │   │
-│   │   ├── lib/                    # Core utilities
-│   │   │   ├── supabase.ts
-│   │   │   ├── utils.ts
-│   │   │   └── constants.ts
-│   │   │
-│   │   ├── types/                  # TypeScript types
-│   │   │   ├── index.ts
-│   │   │   ├── database.types.ts
-│   │   │   ├── supabase.ts
-│   │   │   └── models/
-│   │   │       ├── task.types.ts
-│   │   │       ├── project.types.ts
-│   │   │       └── user.types.ts
-│   │   │
-│   │   └── stores/                 # Global stores
-│   │       └── use-ui-store.ts
+│   │   ├── components/
+│   │   │   ├── ui/                 # shadcn/ui components
+│   │   │   └── layout/             # Header, UserMenu
+│   │   ├── hooks/
+│   │   │   └── use-permission.tsx  # RBAC permission hooks
+│   │   ├── lib/
+│   │   │   ├── supabase.ts         # Supabase client
+│   │   │   ├── database.types.ts   # Database types (hand-maintained)
+│   │   │   └── utils.ts
+│   │   └── types/
+│   │       └── index.ts            # Domain types & constants
 │   │
-│   ├── config/                     # Configuration files
-│   │   ├── env.ts
-│   │   └── query-client.ts
-│   │
-│   ├── assets/                     # Assets (images, fonts, etc)
-│   │   └── react.svg
-│   │
-│   ├── styles/                     # Global styles
-│   │   └── index.css
+│   ├── styles/
+│   │   └── index.css               # Tailwind CSS v4 config + global styles
 │   │
 │   ├── main.tsx                    # Entry point
 │   └── vite-env.d.ts
 │
-├── .env                            # Environment variables
 ├── .env.example
-├── .gitignore
 ├── index.html
 ├── package.json
 ├── tsconfig.json
-├── tsconfig.node.json
 ├── vite.config.ts
-├── tailwind.config.js
-├── postcss.config.js
-├── components.json
+├── components.json                 # shadcn/ui config
 │
-├── supabase-schema.sql            # Database schema
-├── fix-rls-policy.sql
-│
-└── docs/                          # Documentation
-    ├── README.md
-    ├── SETUP.md
-    ├── QUICKSTART.md
-    ├── PROJECT_OVERVIEW.md
-    ├── IMPLEMENTATION_SUMMARY.md
-    ├── TYPESCRIPT_NOTES.md
-    ├── DARK_MODE.md
-    ├── TOOLTIP_USAGE.md
-    ├── ZUSTAND_GUIDE.md
-    └── FOLDER_STRUCTURE.md
+├── supabase-schema.sql             # Database schema + RLS policies
+└── fix-rls-policy.sql              # RLS patch for project_members
 ```
+
+> Note: Tailwind CSS v4 is configured via the `@tailwindcss/vite` plugin and CSS (`src/styles/index.css`) — there is no `tailwind.config.js`.
 
 ## 🔄 Real-time Features
 
